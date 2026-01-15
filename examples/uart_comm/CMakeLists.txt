@@ -1,0 +1,12 @@
+if(CONFIG_EXAMPLES_UART_COMM)
+  nuttx_add_application(
+    NAME
+    ${CONFIG_EXAMPLES_UART_COMM_PROGNAME}
+    STACKSIZE
+    ${CONFIG_EXAMPLES_UART_COMM_STACKSIZE}
+    MODULE
+    ${CONFIG_EXAMPLES_UART_COMM}
+    SRCS
+    uart_comm.c
+  )
+endif()
