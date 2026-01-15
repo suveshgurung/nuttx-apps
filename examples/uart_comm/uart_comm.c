@@ -5,7 +5,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "uart_comm.h"
@@ -18,7 +17,7 @@ int main(int argc, FAR char *argv[]) {
     return -1;
   }
 
-  if (init_uart(uart1_fd, B115200, true) == -1) {
+  if (init_uart(uart1_fd, B115200) == -1) {
     printf("ERROR: Could not initialize usart1\n");
     return -1;
   }
@@ -28,7 +27,7 @@ int main(int argc, FAR char *argv[]) {
   return 0;
 }
 
-static int init_uart(int fd, speed_t baudrate, bool is_tx) {
+static int init_uart(int fd, speed_t baudrate) {
   struct termios tio;
 
   if (tcgetattr(fd, &tio) != 0) {
@@ -38,17 +37,11 @@ static int init_uart(int fd, speed_t baudrate, bool is_tx) {
 
   cfsetspeed(&tio, baudrate);
 
-  // No need to configure these for USART1 since it is the NSH console.
-  if (is_tx) {
-    tio.c_cflag &= ~PARENB;
-    tio.c_cflag &= ~CSTOPB;
-    tio.c_cflag &= ~CSIZE;
-    tio.c_cflag |= CS8;
-    tio.c_cflag |= (CLOCAL | CREAD);
-    // tio.c_cflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    // tio.c_iflag &= ~(IXON | IXOFF | IXANY);
-    // tio.c_oflag &= ~OPOST;
-  }
+  tio.c_cflag &= ~PARENB;
+  tio.c_cflag &= ~CSTOPB;
+  tio.c_cflag &= ~CSIZE;
+  tio.c_cflag |= CS8;
+  tio.c_cflag |= (CLOCAL | CREAD);
 
   if (tcsetattr(fd, TCSANOW, &tio) != 0) {
     printf("ERROR: failed to set attribtues: %d\n", errno);
